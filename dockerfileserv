@@ -10,12 +10,21 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /var/run/sshd \
-    && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \
-    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
-    && echo "root:toor" | chpasswd
+    && sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config \
+    && echo "PermitRootLogin no" >> /etc/ssh/sshd_config \
+    && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config \
+    && echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config \
+    && echo "UsePAM yes" >> /etc/ssh/sshd_config \
+    && echo "PubkeyAuthentication no" >> /etc/ssh/sshd_config \
+    && echo "LogLevel INFO" >> /etc/ssh/sshd_config
+
+
+RUN useradd -m -s /bin/bash appuser && echo "appuser:password123" | chpasswd
+
 
 COPY jail.local /etc/fail2ban/jail.local
 COPY sshd.conf /etc/fail2ban/filter.d/sshd.conf
+
 
 COPY knockd.conf /etc/knockd.conf
 RUN sed -i 's/START_KNOCKD=0/START_KNOCKD=1/' /etc/default/knockd
@@ -23,7 +32,7 @@ RUN sed -i 's/START_KNOCKD=0/START_KNOCKD=1/' /etc/default/knockd
 COPY init.sh /init.sh
 RUN chmod +x /init.sh
 
-EXPOSE 2222
+EXPOSE 22
 EXPOSE 7000/udp 8000/udp 9000/udp
 
 CMD ["/init.sh"]
