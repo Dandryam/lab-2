@@ -17,4 +17,11 @@ iptables -A INPUT -p udp --dport 9000 -j ACCEPT
 # Запуск сервисов
 service knockd start
 service fail2ban start
-/usr/sbin/sshd -D
+
+# Перегенерация host keys (если отсутствуют)
+if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
+    ssh-keygen -A
+fi
+
+# Запуск SSH в передний план
+/usr/sbin/sshd -D -e
