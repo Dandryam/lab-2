@@ -1,5 +1,11 @@
 FROM ubuntu:22.04
 
+
+RUN useradd -r -s /usr/sbin/nologin serviceuser
+
+RUN usermod -s /usr/sbin/nologin root
+RUN usermod -s /usr/sbin/nologin serviceuser
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     openssh-server \
     fail2ban \
