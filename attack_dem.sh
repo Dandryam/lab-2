@@ -6,7 +6,7 @@ USER="appuser"
 PASSWORD="password123"
 KNOCK_PORTS="7000 8000 9000"
 
-# Функции для цветного вывода
+# Функции цветного вывода
 red() { echo -e "\033[0;31m$@\033[0m"; }
 green() { echo -e "\033[0;32m$@\033[0m"; }
 blue() { echo -e "\033[0;34m$@\033[0m"; }
@@ -17,6 +17,12 @@ header() {
     echo "===================================="
 }
 
+# Проверка утилиты knock
+if ! command -v knock &> /dev/null; then
+    red "Утилита 'knock' не установлена. Установите: sudo apt-get install knockd"
+    exit 1
+fi
+
 # 1. Проверка без knocking
 header "1. Проверка Port Knocking: подключение без последовательности"
 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=3 ${USER}@${SERVER} -p ${PORT} 2>/dev/null \
@@ -24,7 +30,7 @@ ssh -o StrictHostKeyChecking=no -o ConnectTimeout=3 ${USER}@${SERVER} -p ${PORT}
     || green "[✓] Успех: Подключение без knocking отклонено"
 
 # 2. Выполнение knocking
-header "2. Выполнение Port Knocking (последовательность: ${KNOCK_PORTS})"
+header "2. Выполнение Port Knocking (${KNOCK_PORTS})"
 knock -d 300 -v ${SERVER} ${KNOCK_PORTS}
 
 # 3. Проверка после knocking
@@ -35,7 +41,7 @@ sshpass -p "${PASSWORD}" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=3 \
     || red "[X] ОШИБКА: Не удалось подключиться после knocking"
 
 # 4. Проверка Fail2Ban
-header "4. Проверка Fail2Ban: имитация атаки подбора пароля"
+header "4. Проверка Fail2Ban: имитация атаки"
 for i in {1..3}; do 
     sshpass -p "wrongpass" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=3 \
         attacker@${SERVER} -p ${PORT} 2>/dev/null \
