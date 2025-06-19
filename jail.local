@@ -1,6 +1,6 @@
 [sshd]
 enabled = true
-port = 22
+port = 2222
 filter = sshd
 logpath = /var/log/auth.log
 maxretry = 3

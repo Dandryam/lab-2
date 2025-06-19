@@ -1,5 +1,11 @@
 FROM ubuntu:22.04
 
+
+RUN useradd -r -s /usr/sbin/nologin serviceuser
+
+RUN usermod -s /usr/sbin/nologin root
+RUN usermod -s /usr/sbin/nologin serviceuser
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     openssh-server \
     fail2ban \
@@ -10,7 +16,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /var/run/sshd \
-    && sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config \
+    && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \
     && echo "PermitRootLogin no" >> /etc/ssh/sshd_config \
     && echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config \
     && echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config \

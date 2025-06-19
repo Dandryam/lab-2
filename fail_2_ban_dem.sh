@@ -1,7 +1,7 @@
 # Клиентская машина
 # Имитация 3 неудачных попыток входа
 for i in {1..3}; do 
-    ssh root@localhost -p 2222 -o "UserKnownHostsFile=/dev/null" 
+    ssh attacker@localhost -p 2222 -o "UserKnownHostsFile=/dev/null" 
 done
 
 # Проверка бана
