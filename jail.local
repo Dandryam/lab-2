@@ -4,8 +4,6 @@ port = 2222
 filter = sshd
 logpath = /var/log/auth.log
 maxretry = 3
-bantime = 30
+bantime = 60
 findtime = 300
-
-# Дополнительная защита - бан на уровне iptables
 banaction = iptables-multiport
