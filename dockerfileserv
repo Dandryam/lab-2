@@ -1,0 +1,29 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    openssh-server \
+    fail2ban \
+    knockd \
+    iptables \
+    net-tools \
+    iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /var/run/sshd \
+    && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && echo "root:toor" | chpasswd
+
+COPY jail.local /etc/fail2ban/jail.local
+COPY sshd.conf /etc/fail2ban/filter.d/sshd.conf
+
+COPY knockd.conf /etc/knockd.conf
+RUN sed -i 's/START_KNOCKD=0/START_KNOCKD=1/' /etc/default/knockd
+
+COPY init.sh /init.sh
+RUN chmod +x /init.sh
+
+EXPOSE 2222
+EXPOSE 7000/udp 8000/udp 9000/udp
+
+CMD ["/init.sh"]
