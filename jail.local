@@ -1,8 +1,11 @@
 [sshd]
 enabled = true
-port = 2222
+port = 22
 filter = sshd
 logpath = /var/log/auth.log
 maxretry = 3
-bantime = 120
-findtime = 60
+bantime = 600
+findtime = 300
+
+# Дополнительная защита - бан на уровне iptables
+banaction = iptables-multiport
